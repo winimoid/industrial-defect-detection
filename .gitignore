@@ -14,3 +14,12 @@ models/*
 # only keep the best models we want to share
 !models/best.onnx
 !models/best.pt
+!models/finetuned/best.onnx
+!models/finetuned/best.pt
+
+# Node
+node_modules/
+dist/
+build/
+.eslintcache
+*.log

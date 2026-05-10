@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --grid-color: rgba(148, 163, 184, 0.1);
+}
+
+.dark {
+  --grid-color: rgba(30, 41, 59, 0.5);
+}
+
+/* Engineering Grid Paper Effect */
+.industrial-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+}
+
+/* Make the grid lines darker and more subtle in Dark Mode */
+.dark .industrial-grid {
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+}

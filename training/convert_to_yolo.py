@@ -10,7 +10,20 @@ random.seed(42)
 SRC = "data/mvtc/leather"
 DST = "data/yolo"
 
-CLASS_ID = 0  # only one class: defect
+# Multi‑class mapping: defect type → class ID
+DEFECT_CLASSES = {
+    "color": 0,
+    "cut":   1,
+    "fold":  2,
+    "glue":  3,
+    "poke":  4,
+}
+
+# utility to force delete read-only files
+def force_delete(func, path, exc_info):
+    """Force delete read-only files."""
+    os.chmod(path, 0o777)
+    func(path)
 
 # ---------- Helper: mask to YOLO bbox ----------
 def mask_to_yolo_bbox(mask_path, class_id=0):
@@ -33,7 +46,9 @@ def mask_to_yolo_bbox(mask_path, class_id=0):
 for sub in ["images/train", "images/val", "labels/train", "labels/val"]:
     d = os.path.join(DST, sub)
     if os.path.exists(d):
-        shutil.rmtree(d)
+        os.chmod(d, 0o777)
+        shutil.rmtree(d, onerror=force_delete)
+        # shutil.rmtree(d)
     os.makedirs(d, exist_ok=True)
 
 # ---------- Collect defective images ----------
@@ -78,11 +93,11 @@ def safe_copy(src_path, dst_dir, dst_name):
 # ---------- Process defective images ----------
 def process_set(pairs, img_dst_dir, lbl_dst_dir):
     for img_path, mask_path, defect_type, new_name in pairs:
-        # Copy image with new unique name
         safe_copy(img_path, img_dst_dir, new_name)
 
-        # Generate YOLO label file, name must match new_name
-        annotation = mask_to_yolo_bbox(mask_path, CLASS_ID)
+        # Get the correct class ID for this defect type
+        class_id = DEFECT_CLASSES[defect_type]
+        annotation = mask_to_yolo_bbox(mask_path, class_id)
         if annotation is None:
             print(f"Empty mask for {img_path} - skipping")
             continue
